@@ -56,18 +56,21 @@ kelime_listesi = {
         {"tr": "Hiyerarşi", "en": "Hierarchy"}
     ]
 }
-puan = 0,
-def zorluk_secimi(zorluk): 
-        zorluk = input("Zorluk seviyesini yazın: ").lower().strip()
+puan = 0
+
+def zorluk_secimi(): 
+    while True:
+        zorluk = input("Zorluk seviyesini yazın (kolay/orta/zor): ").lower().strip()
         if zorluk in kelime_listesi:
             return zorluk
         else:
             print("Hatalı giriş! Lütfen 'kolay', 'orta' veya 'zor' yazın.")
 
 while True:
-    zorluk_secimi()
-    secilen_veri = random.choice(kelime_listesi[zorluk])
-    print(f"bu kelimenin ingilizcesini telafuz ediniz: {secilen_veri['tr']} ")
+    zorluk = zorluk_secimi()
+    secilen_kelime = random.choice(kelime_listesi[zorluk])
+
+    print(f"Bu kelimenin İngilizcesini telafuz ediniz: {secilen_kelime['tr']} ")
     print("Şimdi konuşun...")
     recording = sd.rec(
     int(duration * sample_rate), # kaydedilecek örnek sayısı
@@ -82,18 +85,19 @@ while True:
     recognizer = sr.Recognizer()
     with sr.AudioFile("output.wav") as source:
         audio = recognizer.record(source)
+    text = ""
     try:
         text = recognizer.recognize_google(audio, language="en")
     except sr.UnknownValueError:             # - Google gürültü veya sessizlik nedeniyle konuşmayı anlayamadığında
         print("Konuşma tanınamadı.")
     except sr.RequestError as e:             # - İnternet bağlantısı yoksa veya API kullanılamıyorsa
         print(f"Hizmet hatası: {e}")
-    if text.lower() == secilen_veri['en'].lower():
+    if text.lower() == secilen_kelime['en'].lower():
         print("Tebrikler! Doğru telaffuz ettiniz:", text)
         puan += 10
 
     else:
-        print(f"Yanlış telaffuz. Doğru cevap: {secilen_veri['en']}, Sizinki: {text}")
+        print(f"Yanlış telaffuz. Doğru cevap: {secilen_kelime['en']}, Sizinki: {text}")
     karar=input("Devam etmek istiyor musunuz? (e/h): ").lower()
     if karar !='e':
         print(f"Toplam puanınız: {puan}")
